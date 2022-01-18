@@ -25,8 +25,8 @@ if version.endswith(("a", "b")):
 with open("README.md", "r") as readme_file:
     readme = readme_file.read()
 
-with open('CHANGELOG.md', "r") as changelog_file:
-    changelog = changelog_file.read()
+# with open('CHANGELOG.md', "r") as changelog_file:
+#     changelog = changelog_file.read()
 
 setuptools.setup(
     name="testcord",
@@ -34,7 +34,7 @@ setuptools.setup(
     author="KoalaBotUK",
     author_email="KoalaBotUK@gmail.com",
     description="A package that assists in writing tests for pycord",
-    long_description=readme + '\n\n' + changelog,
+    long_description=readme, # + '\n\n' + changelog,
     long_description_content_type="text/markdown",
     url="https://github.com/KoalaBotUK/testcord",
     packages=["discord.ext.test"],
