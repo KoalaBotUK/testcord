@@ -265,14 +265,12 @@ def dict_from_overwrite(target: typing.Union[discord.Member, discord.Role], over
     ovr = {
         'id': target.id,
         'allow': allow.value,
-        'deny': deny.value,
-        'allow_new': allow.value,
-        'deny_new': deny.value
+        'deny': deny.value
     }
     if isinstance(target, discord.Role):
-        ovr['type'] = 'role'
+        ovr['type'] = discord.abc._Overwrites.ROLE
     else:
-        ovr['type'] = 'member'
+        ovr['type'] = discord.abc._Overwrites.MEMBER
     return ovr
 
 
@@ -371,7 +369,6 @@ def make_message_dict(
     mentions = list(map(dict_from_user, mentions)) if mentions else []
     mention_channels = list(map(_mention_from_channel, mention_channels)) if mention_channels else []
     attachments = list(map(dict_from_attachment, attachments)) if attachments else []
-    embeds = list(map(discord.Embed.to_dict, embeds)) if embeds else []
 
     out = {
         'id': id_num,
@@ -426,7 +423,7 @@ def dict_from_message(message: discord.Message) -> _types.JsonDict:
     }
 
     items = ('content', 'pinned', 'application', 'activity',
-             'mention_everyone', 'tts', 'type', 'nonce')
+             'mention_everyone', 'tts', 'type', 'nonce', 'guild')
     _fill_optional(out, message, items)
     return out
 

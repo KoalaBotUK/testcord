@@ -39,7 +39,6 @@ setuptools.setup(
     url="https://github.com/KoalaBotUK/testcord",
     packages=["discord.ext.test"],
     classifiers=[
-        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",

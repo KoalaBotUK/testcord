@@ -14,7 +14,10 @@ import re
 import typing
 import datetime
 import discord
+from discord.errors import NotFound, Forbidden
 import discord.http as dhttp
+from discord.types import embed, message, components, sticker
+from discord.types.snowflake import Snowflake
 import pathlib
 import urllib.parse
 import urllib.request
@@ -134,7 +137,7 @@ class FakeHttp(dhttp.HTTPClient):
                 if channel.id == channel_id:
                     find = facts.dict_from_channel(channel)
         if find is None:
-            raise discord.errors.NotFound(FakeRequest(404, "Not Found"), "Unknown Channel")
+            raise NotFound(FakeRequest(404, "Not Found"), "Unknown Channel")
         return find
 
     async def start_private_message(self, user_id: int) -> _types.JsonDict:
@@ -146,22 +149,21 @@ class FakeHttp(dhttp.HTTPClient):
         return facts.make_dm_channel_dict(user)
 
     async def send_message(
-            self,
-            channel_id: int,
-            content: str,
-            *,
-            tts: bool = False,
-            embed: typing.Optional[_types.JsonDict] = None,
-            nonce: typing.Optional[int] = None,
-            allowed_mentions: typing.Optional[_types.JsonDict] = None,
-            message_reference: typing.Optional[_types.JsonDict] = None,
-    ) -> _types.JsonDict:
+        self,
+        channel_id: Snowflake,
+        content: typing.Optional[str],
+        *,
+        tts: bool = False,
+        embed: typing.Optional[embed.Embed] = None,
+        embeds: typing.Optional[typing.List[embed.Embed]] = None,
+        nonce: typing.Optional[str] = None,
+        allowed_mentions: typing.Optional[message.AllowedMentions] = None,
+        message_reference: typing.Optional[message.MessageReference] = None,
+        stickers: typing.Optional[typing.List[sticker.StickerItem]] = None,
+        components: typing.Optional[typing.List[components.Component]] = None,) -> _types.JsonDict:
         locs = _get_higher_locs(1)
         channel = locs.get("channel", None)
 
-        embeds = []
-        if embed:
-            embeds = [discord.Embed.from_dict(embed)]
         user = self.state.user
         if hasattr(channel, "guild"):
             perm = channel.permissions_for(channel.guild.get_member(user.id))
@@ -169,6 +171,9 @@ class FakeHttp(dhttp.HTTPClient):
             perm = channel.permissions_for(user)
         if not (perm.send_messages or perm.administrator):
             raise discord.errors.Forbidden(FakeRequest(403, "missing send_messages"), "send_messages")
+
+        if embed:
+            embeds = [embed]
 
         message = make_message(
             channel=channel, author=self.state.user, content=content, tts=tts, embeds=embeds, nonce=nonce
@@ -185,16 +190,19 @@ class FakeHttp(dhttp.HTTPClient):
         await callbacks.dispatch_event("send_typing", channel)
 
     async def send_files(
-            self,
-            channel_id: int,
-            *,
-            files: typing.Iterable[discord.File],
-            content: typing.Optional[str] = None,
-            tts: bool = False,
-            embed: typing.Optional[_types.JsonDict] = None,
-            nonce: typing.Optional[int] = None,
-            allowed_mentions: typing.Optional[_types.JsonDict] = None,
-            message_reference: typing.Optional[_types.JsonDict] = None,
+        self,
+        channel_id: Snowflake,
+        *,
+        files: typing.Sequence[discord.File],
+        content: typing.Optional[str] = None,
+        tts: bool = False,
+        embed: typing.Optional[embed.Embed] = None,
+        embeds: typing.Optional[typing.List[embed.Embed]] = None,
+        nonce: typing.Optional[str] = None,
+        allowed_mentions: typing.Optional[message.AllowedMentions] = None,
+        message_reference: typing.Optional[message.MessageReference] = None,
+        stickers: typing.Optional[typing.List[sticker.StickerItem]] = None,
+        components: typing.Optional[typing.List[components.Component]] = None,
     ) -> _types.JsonDict:
         # allowed_mentions is being ignored.  It must be a keyword argument but I'm not yet certain what to use it for
         locs = _get_higher_locs(1)
@@ -211,7 +219,6 @@ class FakeHttp(dhttp.HTTPClient):
             attachments.append((path, file.filename))
         attachments = list(map(lambda x: make_attachment(*x), attachments))
 
-        embeds = []
         if embed:
             embeds = [discord.Embed.from_dict(embed)]
 
@@ -287,7 +294,7 @@ class FakeHttp(dhttp.HTTPClient):
         messages = _cur_config.messages[channel_id]
         find = next(filter(lambda m: m["id"] == message_id, messages), None)
         if find is None:
-            raise discord.errors.NotFound(FakeRequest(404, "Not Found"), "Unknown Message")
+            raise NotFound(FakeRequest(404, "Not Found"), "Unknown Message")
         return find
 
     async def logs_from(
@@ -475,7 +482,7 @@ class FakeHttp(dhttp.HTTPClient):
         user = self.state.user
         perm: discord.Permissions = channel.permissions_for(channel.guild.get_member(user.id))
         if not (perm.administrator or perm.manage_permissions):
-            raise discord.errors.Forbidden(FakeRequest(403, "missing manage_roles"), "manage_roles")
+            raise Forbidden(FakeRequest(403, "missing manage_roles"), "manage_roles")
 
         ovr = discord.PermissionOverwrite.from_pair(discord.Permissions(allow_value), discord.Permissions(deny_value))
         update_text_channel(channel, target, ovr)
