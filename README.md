@@ -1,6 +1,7 @@
 # Testcord
 
-[![Build Status](https://travis-ci.com/KoalaBotUK/testcord.svg?branch=master)](https://travis-ci.com/KoalaBotUK/testcord)
+[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/KoalaBotUK/testcord/CI?label=tests&style=flat-square)](https://github.com/KoalaBotUK/testcord/actions/)
+![Codecov](https://img.shields.io/codecov/c/github/KoalaBotUK/testcord?style=flat-square)
 [![Documentation Status](https://readthedocs.org/projects/testcord/badge/?version=latest)](https://testcord.readthedocs.io/en/latest/?badge=latest)
 [![Discord Server](https://img.shields.io/discord/729325378681962576.svg?style=flat-square&logo=discord&logoColor=white&labelColor=697EC4&color=7289DA&label=%20)](https://discord.gg/5etEjVd)
 
