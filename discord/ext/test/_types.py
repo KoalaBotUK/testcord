@@ -11,4 +11,13 @@ JsonVal = typing.Union[str, int, bool, typing.Dict[str, 'JsonVal'], typing.List[
 JsonDict = typing.Dict[str, JsonVal]
 JsonList = typing.List[JsonVal]
 Callback = typing.Callable[..., typing.Coroutine[None, None, None]]
-AnyChannel = typing.Union[discord.TextChannel, discord.CategoryChannel, discord.abc.GuildChannel, discord.abc.PrivateChannel]
+AnyChannel = typing.Union[discord.TextChannel, discord.CategoryChannel,
+                          discord.abc.GuildChannel, discord.abc.PrivateChannel]
+
+
+class FakeRequest(typing.NamedTuple):
+    """
+        A fake web response, for use with discord ``HTTPException``
+    """
+    status: int
+    reason: str
